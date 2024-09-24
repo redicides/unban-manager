@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./data.sqlite"
+}
+
+model Guild {
+  id String @id
+
+  manager_roles String @default("[]")
+
+  logging_toggled    Boolean @default(true)
+  logging_channel_id String?
+
+  rebans Reban[]
+}
+
+model Reban {
+  id          Int    @id @default(autoincrement())
+  guild_id    String
+  target_id   String
+  executor_id String
+  created_at  BigInt
+  reason      String
+
+  guild Guild @relation(fields: [guild_id], references: [id], onDelete: Cascade)
+}

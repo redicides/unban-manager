@@ -1,0 +1,42 @@
+{
+  "name": "unban-manager",
+  "version": "1.0.0",
+  "description": "A utility bot that screens server unbans and tracks down ones that shouldn't go through.",
+  "author": {
+    "name": "redicides",
+    "url": "https://github.com/redicides"
+  },
+  "license": "CC0-1.0",
+  "homepage": "https://github.com/redicides/unban-manager#readme",
+  "repository": {
+    "url": "https://github.com/redicides/unban-manager"
+  },
+  "bugs": {
+    "url": "https://github.com/redicides/unban-manager/issues"
+  },
+  "keywords": ["Discord", "Discord-Bot"],
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "db:push": "prisma db push"
+  },
+  "dependencies": {
+    "discord.js": "14.15.3",
+    "yaml": "^2.5.0",
+    "zod": "^3.23.8",
+    "zod-validation-error": "^3.3.1"
+  },
+  "overrides": {
+    "@discordjs/builders": "1.8.2"
+  },
+  "devDependencies": {
+    "@prisma/client": "5.18.0",
+    "typescript": "^5.5.3",
+    "tsc-alias": "~1.8.10",
+    "dotenv": "16.4.5",
+    "prisma": "5.18.0"
+  },
+  "private": true
+}

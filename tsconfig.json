@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    // Strict Type-Checking
+    "strict": true,
+    "alwaysStrict": true,
+
+    // Module Resolution Options
+    "lib": ["ESNext"],
+    "module": "Node16",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "importHelpers": true,
+
+    // Source Map Options
+    "sourceMap": true,
+    "sourceRoot": "src",
+    "inlineSources": true,
+
+    // Advanced Options
+    "skipLibCheck": true,
+    "downlevelIteration": true,
+
+    // Output Options
+    "target": "ES2020",
+    "outDir": "dist",
+    "rootDir": "src",
+
+    // Decorator Options
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // Additional Options
+    "pretty": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+
+    // Path Mapping
+    "paths": {
+      "@/*": ["./src/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@managers/*": ["./src/managers/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "prisma"]
+}

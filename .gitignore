@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+config.yml
+data.sqlite
+.idea
+DS_STORE
+.vscode
