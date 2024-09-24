@@ -4,5 +4,5 @@ dist
 config.yml
 data.sqlite
 .idea
-DS_STORE
+.DS_STORE
 .vscode
