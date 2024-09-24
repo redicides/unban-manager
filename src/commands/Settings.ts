@@ -211,9 +211,9 @@ export default class Settings extends Command<ChatInputCommandInteraction<'cache
     if (
       !channel
         .permissionsFor(interaction.guild.members.me!)
-        .has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])
+        .has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])
     ) {
-      throw 'I cannot set that channel as the logging channel because I do not have the required permissions to send messages and embed links.';
+      throw 'I cannot set that channel as the logging channel because I do not have the required permissions to view it, or send messages and embed links.';
     }
 
     await prisma.guild.update({

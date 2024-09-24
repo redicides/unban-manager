@@ -15,6 +15,13 @@ For more information on what environment variables need to be set [click here](h
 
 Ensure that you have properly set up your environment variables and global config. These files must be in the **root** directory of the project, outside of the `src` folder, and must be named `.env` and `config.yml` respectively.
 
+The following permissions **must** be granted in discord for things to work effectively; it is not recommended to give the bot "Administrator":
+
+- Send Messages
+- Embed Links
+- View Audit Log
+- Ban Members
+
 ## Initially
 
 - All of the following commands must be ran on the root directory of the project.
