@@ -74,6 +74,8 @@ main().catch(error => {
   Logger.error(`An error occurred while starting the bot...`, error);
 });
 
+// Process events
+
 process.on('unhandledRejection', error => {
   Logger.error(`An unhandled rejection occurred...`, error);
 });
