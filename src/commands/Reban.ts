@@ -8,7 +8,9 @@ import {
   GuildMember,
   PermissionFlagsBits,
   time,
-  User
+  User,
+  Message,
+  hideLinkEmbed
 } from 'discord.js';
 import { Guild as DatabaseGuild, Reban as RebanType } from '@prisma/client';
 
@@ -48,7 +50,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
             ]
           },
           {
-            name: Subcommand.View,
+            name: Subcommand.Info,
             description: 'View in depth information about a re-ban.',
             type: ApplicationCommandOptionType.Subcommand,
             options: [
@@ -117,7 +119,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     switch (subcommand) {
       case Subcommand.Search:
         return Reban.search(interaction);
-      case Subcommand.View:
+      case Subcommand.Info:
         return Reban.view(interaction);
       case Subcommand.Delete:
         return Reban.delete(interaction);
@@ -134,12 +136,25 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
       ephemeral: false
     });
 
-    const count = await prisma.reban.count({
-      where: {
-        guild_id: interaction.guildId,
-        target_id: target.id
-      }
-    });
+    const [count, rebans] = await prisma.$transaction([
+      prisma.reban.count({
+        where: {
+          guild_id: interaction.guildId,
+          target_id: target.id
+        }
+      }),
+      prisma.reban.findMany({
+        where: {
+          guild_id: interaction.guildId,
+          target_id: target.id
+        },
+        orderBy: {
+          id: 'desc'
+        },
+        take: REBANS_PER_PAGE,
+        skip: REBANS_PER_PAGE * (page - 1)
+      })
+    ]);
 
     let embed = new EmbedBuilder()
       .setAuthor({ name: `Re-bans for @${target.username}`, iconURL: target.displayAvatarURL() })
@@ -153,18 +168,6 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
 
     const pages = Math.ceil(count / 7);
     if (page > pages) page = pages;
-
-    const rebans = await prisma.reban.findMany({
-      where: {
-        guild_id: interaction.guildId,
-        target_id: target.id
-      },
-      orderBy: {
-        id: 'desc'
-      },
-      take: REBANS_PER_PAGE,
-      skip: REBANS_PER_PAGE * (page - 1)
-    });
 
     embed = new EmbedBuilder()
       .setAuthor({ name: `Re-bans for @${target.username}`, iconURL: target.displayAvatarURL() })
@@ -192,15 +195,15 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     }
 
     const target = await client.users.fetch(reban.target_id).catch(() => null);
-    const executor = await client.users.fetch(reban.executor_id).catch(() => null);
+    const offender = await client.users.fetch(reban.offender_id).catch(() => null);
 
     const embed = new EmbedBuilder()
-      .setAuthor({ name: `Re-ban #${reban.id}`, iconURL: executor?.displayAvatarURL() })
+      .setAuthor({ name: `Re-ban #${reban.id}`, iconURL: offender?.displayAvatarURL() })
       .setColor(Colors.NotQuiteBlack)
       .setFields([
         {
-          name: 'Executor',
-          value: executor ? userMentionWithId(executor.id) : 'Not Found'
+          name: 'Offender',
+          value: offender ? userMentionWithId(offender.id) : 'Not Found'
         },
         {
           name: 'Target',
@@ -237,7 +240,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
       where: { id: id, guild_id: interaction.guildId }
     });
 
-    const result = await Reban._logDeletion({
+    const log = await Reban._logDeletion({
       config: reban.guild,
       guild: interaction.guild,
       executor: interaction.member,
@@ -247,7 +250,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
 
     return interaction.editReply({
       content: `Re-ban with ID **#${id}** for ${userMentionWithId(reban.target_id)} has been deleted.\n${
-        result ? 'Successfully logged the deletion.' : 'Failed to log the deletion.'
+        log ? `Successfully logged the deletion - ${log.url}.` : 'Failed to log the deletion.'
       }`
     });
   }
@@ -283,7 +286,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
       });
     }
 
-    const result = await Reban._logMassDeletion({
+    const log = await Reban._logMassDeletion({
       config,
       guild: interaction.guild,
       executor: interaction.user,
@@ -294,7 +297,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
 
     return interaction.editReply({
       content: `Wiped **${count}** re-bans for ${userMentionWithId(target.id)}.\n${
-        result ? 'Successfully logged the deletion.' : 'Failed to log the deletion.'
+        log ? `Successfully logged the deletion - ${log.url}.` : 'Failed to log the deletion.'
       }`
     });
   }
@@ -319,13 +322,13 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     executor: GuildMember;
     reban: RebanType;
     reason: string;
-  }): Promise<boolean> {
+  }): Promise<Message | null> {
     const { config, guild, executor, reban, reason } = data;
 
-    if (!config.logging_toggled || !config.logging_channel_id) return false;
+    if (!config.logging_toggled || !config.logging_channel_id) return null;
 
     const channel = await guild.channels.fetch(config.logging_channel_id).catch(() => null);
-    if (!channel || !channel.isTextBased()) return false;
+    if (!channel || !channel.isTextBased()) return null;
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `Re-ban #${reban.id} deleted`, iconURL: executor.displayAvatarURL() })
@@ -340,8 +343,8 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
           value: reason
         },
         {
-          name: 'Re-ban Executor',
-          value: userMentionWithId(reban.executor_id)
+          name: 'Re-ban Offender',
+          value: userMentionWithId(reban.offender_id)
         },
         {
           name: 'Re-ban Target',
@@ -352,11 +355,11 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
 
     return channel
       .send({ embeds: [embed] })
-      .then(() => {
-        return true;
+      .then(log => {
+        return log;
       })
       .catch(() => {
-        return false;
+        return null;
       });
   }
 
@@ -367,13 +370,13 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     target: User;
     reason: string;
     count: number;
-  }): Promise<boolean> {
+  }): Promise<Message | null> {
     const { config, guild, executor, target, reason, count } = data;
 
-    if (!config.logging_toggled || !config.logging_channel_id) return false;
+    if (!config.logging_toggled || !config.logging_channel_id) return null;
 
     const channel = await guild.channels.fetch(config.logging_channel_id).catch(() => null);
-    if (!channel || !channel.isTextBased()) return false;
+    if (!channel || !channel.isTextBased()) return null;
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: `${count} re-bans deleted`, iconURL: executor.displayAvatarURL() })
@@ -396,18 +399,18 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
 
     return channel
       .send({ embeds: [embed] })
-      .then(() => {
-        return true;
+      .then(log => {
+        return log;
       })
       .catch(() => {
-        return false;
+        return null;
       });
   }
 }
 
 enum Subcommand {
   Search = 'search',
-  View = 'view',
+  Info = 'info',
   Delete = 'delete',
   Wipe = 'wipe'
 }

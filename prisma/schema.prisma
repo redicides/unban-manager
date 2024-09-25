@@ -22,7 +22,7 @@ model Reban {
   id          Int    @id @default(autoincrement())
   guild_id    String
   target_id   String
-  executor_id String
+  offender_id String
   created_at  BigInt
   reason      String
 

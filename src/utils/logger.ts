@@ -87,18 +87,4 @@ export default class Logger {
     });
     console.error(...values);
   }
-
-  /**
-   * Log a message to the console with the SUCCESS level.
-   *
-   * @param message The message to log
-   * @param full Whether to color the full log or just the level
-   */
-
-  static success(message: string, full: boolean = false): void {
-    Logger.log('SUCCESS', message, {
-      color: AnsiColor.Green,
-      full
-    });
-  }
 }

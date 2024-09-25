@@ -1,4 +1,4 @@
-import { GuildBasedChannel, Role, Snowflake, ThreadChannel } from 'discord.js';
+import { Snowflake } from 'discord.js';
 
 import fs from 'fs';
 import YAML from 'yaml';
@@ -38,14 +38,12 @@ export function readYamlFile<T>(path: string): T {
   return YAML.parse(raw);
 }
 
+/**
+ * Mentions a user with their ID.
+ * @param id The ID of the user to mention.
+ * @returns A string that mentions the user with their ID in the format `<@${id}> (\`${id}\`)`
+ */
+
 export function userMentionWithId(id: Snowflake): `<@${Snowflake}> (\`${Snowflake}\`)` {
   return `<@${id}> (\`${id}\`)`;
-}
-
-export function channelMentionWithName(channel: GuildBasedChannel | ThreadChannel): `<#${Snowflake}> (\`#${string}\`)` {
-  return `<#${channel.id}> (\`#${channel.name}\`)`;
-}
-
-export function roleMentionWithName(role: Role): `<@&${Snowflake}> (\`@${string}\`)` {
-  return `<@&${role.id}> (\`@${role.name}\`)`;
 }

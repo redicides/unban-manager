@@ -21,11 +21,11 @@ export default class InteractionCreate extends EventListener {
   async execute(interaction: Interaction) {
     switch (interaction.type) {
       case InteractionType.ApplicationCommand:
-        return InteractionCreate._handleApplicationCommand(interaction);
+        return InteractionCreate.handleApplicationCommand(interaction);
     }
   }
 
-  private static async _handleApplicationCommand(interaction: CommandInteraction) {
+  private static async handleApplicationCommand(interaction: CommandInteraction) {
     const command = CommandManager._getCommand(interaction.commandName);
 
     let content: string;

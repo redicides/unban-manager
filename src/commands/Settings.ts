@@ -1,16 +1,18 @@
-import ConfigManager from '@/managers/config/ConfigManager';
-import Command, { CommandCategory } from '@managers/commands/Command';
 import {
   ApplicationCommandOptionType,
   ChannelType,
   ChatInputCommandInteraction,
   Colors,
   EmbedBuilder,
-  PermissionFlagsBits,
-  TextChannel
+  PermissionFlagsBits
 } from 'discord.js';
-import { prisma } from '..';
+
 import { Guild } from '@prisma/client';
+
+import { prisma } from '@/index';
+
+import ConfigManager from '@/managers/config/ConfigManager';
+import Command, { CommandCategory } from '@managers/commands/Command';
 
 export default class Settings extends Command<ChatInputCommandInteraction<'cached'>> {
   constructor() {
