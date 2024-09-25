@@ -22,7 +22,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
   constructor() {
     super({
       category: CommandCategory.Management,
-      usage: ['search <user>', 'view <id>', '<'],
+      usage: ['search <user>', 'view <id>', 'delete <id> <reason>', 'wipe <user> <reason>'],
       data: {
         name: 'reban',
         description: 'Re-ban related commands.',
