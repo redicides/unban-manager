@@ -249,7 +249,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     });
 
     return interaction.editReply({
-      content: `Re-ban with ID **#${id}** for ${userMentionWithId(reban.target_id)} has been deleted${log ? ` (${log.url})` : '' }.`
+      content: `Re-ban with ID **#${id}** for ${userMentionWithId(reban.target_id)} has been removed from their record${log ? ` (${log.url})` : '' }.`
     });
   }
 
@@ -294,9 +294,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     });
 
     return interaction.editReply({
-      content: `Wiped **${count}** re-bans for ${userMentionWithId(target.id)}.\n${
-        log ? `Successfully logged the deletion - ${log.url}.` : 'Failed to log the deletion.'
-      }`
+      content: `Wiped **${count}** re-bans from ${userMentionWithId(target.id)} record${log ? ` (${log.url})` : '' }.`
     });
   }
 
