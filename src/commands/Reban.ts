@@ -294,7 +294,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     });
 
     return interaction.editReply({
-      content: `Wiped **${count}** re-bans from ${userMentionWithId(target.id)} record${log ? ` (${log.url})` : '' }.`
+      content: `Wiped **${count}** re-bans from ${userMentionWithId(target.id)}'s record${log ? ` (${log.url})` : '' }.`
     });
   }
 
