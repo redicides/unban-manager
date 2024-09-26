@@ -249,9 +249,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
     });
 
     return interaction.editReply({
-      content: `Re-ban with ID **#${id}** for ${userMentionWithId(reban.target_id)} has been deleted.\n${
-        log ? `Successfully logged the deletion - ${log.url}.` : 'Failed to log the deletion.'
-      }`
+      content: `Re-ban with ID **#${id}** for ${userMentionWithId(reban.target_id)} has been deleted${log ? ` (${log.url})` : '' }.`
     });
   }
 
