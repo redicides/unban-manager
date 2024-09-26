@@ -335,7 +335,7 @@ export default class Reban extends Command<ChatInputCommandInteraction<'cached'>
           value: userMentionWithId(executor.id)
         },
         {
-          name: 'Deleteion Reason',
+          name: 'Deletion Reason',
           value: reason
         },
         {
