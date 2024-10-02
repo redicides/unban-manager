@@ -14,6 +14,6 @@ export default class Ready extends EventListener {
       full: true
     });
 
-    return this.client.user?.setActivity({ name: 'Watching unbans go brrr', type: ActivityType.Custom });
+    return this.client.user?.setActivity({ name: 'Audit Log', type: ActivityType.Listening });
   }
 }
